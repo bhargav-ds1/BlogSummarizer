@@ -1,46 +1,19 @@
-from llama_index.core.query_engine.custom import STR_OR_RESPONSE_TYPE
 from transformers import AutoModelForCausalLM
 from llama_index.core import Settings, StorageContext
-from llama_index.core import DocumentSummaryIndex, load_index_from_storage, VectorStoreIndex
-from llama_index.core.query_engine import CustomQueryEngine
+from llama_index.core import DocumentSummaryIndex
 from llama_index.core.response_synthesizers import ResponseMode, get_response_synthesizer
 from llama_index.core.indices.prompt_helper import PromptHelper
-from llama_index.core.response_synthesizers import BaseSynthesizer
 from SummaryGen.fetch_blogs import FetchBlogs
 from llama_index.core.storage.docstore import SimpleDocumentStore
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.core.callbacks.base import CallbackManager
-from llama_index.core.schema import NodeWithScore, QueryBundle
-from llama_index.core.callbacks.schema import CBEventType, EventPayload
 from llama_index.core.prompts import SelectorPromptTemplate
 from llama_index.core.prompts.base import PromptTemplate
 from llama_index.core.prompts.prompt_type import PromptType
-import os
-
+import llama_index.core.query_engine as qe
+from llama_index.core.base.response.schema import StreamingResponse
 from Observability import InitializeObservability
 from dotenv import load_dotenv
 import os
-
-
-# fetch blogs
-
-#
-class SummaryQueryEngine(CustomQueryEngine):
-    docstore: SimpleDocumentStore
-    response_synthesizer: BaseSynthesizer
-
-    def custom_query(self, query_str: str) -> STR_OR_RESPONSE_TYPE:
-        document = self.docstore.get_document(doc_id=query_str)
-        nodes = [NodeWithScore(node=node, score=1.0) for node in
-                 SentenceSplitter().get_nodes_from_documents(documents=[document])]
-        query = 'Summarize the information.'
-        query_bundle = QueryBundle(query_str=query)
-        response = self.response_synthesizer.synthesize(
-            query=query_bundle,
-            nodes=nodes,
-            streaming=True
-        )
-        return response
+from SummaryGen.blog_summary_query_engine import BlogSummaryQueryEngine, CustomRetriever
 
 
 class DocumentSummaryGenerator:
@@ -52,8 +25,14 @@ class DocumentSummaryGenerator:
                  embedding_provider: str = 'llama-index-huggingface',
                  embedding_model_name: str = 'sentence-transformers/all-MiniLM-L12-v2',
                  embedding_model_path: str = 'Models/sentence-transformers/all-MiniLM-L12-v2',
-                 refetch_blogs: bool = False, output_dir: str = None):
+                 refetch_blogs: bool = False, output_dir: str = None, query_engine_type: qe.BaseQueryEngine = None,
+                 query_engine_kwargs: dict = None, response_mode: str = 'tree_summarize',
+                 chunk_size: int = 1024, chunk_overlap: int = 128,
+                 streaming: bool = False, summary_template_str: str = None, use_async: bool = False):
         super().__init__()
+        root_dir = os.path.dirname(os.path.dirname(__file__))
+        InitializeObservability(observ_provider='phoenix')
+        load_dotenv(root_dir + '/.envfile')
         self.llm_provider = llm_provider
         self.llm_model_name = llm_model_name
         self.llm_model_path = llm_model_path
@@ -71,9 +50,38 @@ class DocumentSummaryGenerator:
         self.blog_fetcher = FetchBlogs()
         self.refetch_blogs = refetch_blogs
         self.output_dir = output_dir
-        root_dir = os.path.dirname(__file__)
-        InitializeObservability(observ_provider='phoenix')
-        load_dotenv(root_dir + '/.envfile')
+        self.summary_template_str = summary_template_str
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.streaming = streaming
+        ##############################
+        self.llm = self.get_llm_model()
+        Settings.llm = self.llm
+        ##############################
+        try:
+            self.response_mode = ResponseMode(response_mode)
+        except Exception as e:
+            print('Invalid Response mode:' +str(e))
+        self.use_async = use_async
+        self.response_synthesizer = self.get_response_synthesizer()
+        ##############################
+        self.docstore = self.get_documents()
+        # self.query_engine = BlogSummaryQueryEngine(docstore=self.docstore,
+        #                                           response_synthesizer=self.response_synthesizer,
+        #                                           chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap,
+        #                                           )
+        self.retriever = CustomRetriever(docstore=self.docstore, chunk_size=self.chunk_size,
+                                         chunk_overlap=self.chunk_overlap)
+        if hasattr(qe, query_engine_type):
+            self.query_engine_type = getattr(qe, query_engine_type)
+        else:
+            raise ModuleNotFoundError('The specified type of query engine is not available')
+        try:
+            self.query_engine = self.query_engine_type(response_synthesizer=self.response_synthesizer,
+                                                       retriever=self.retriever)
+        except Exception as e:
+            print('Exception occured while creating the specified query engine:' + str(e))
+
 
     def get_llm_model(self):
         # option to use llm from different sources, HuggingFace, Langchain, AWS, etc.
@@ -106,6 +114,12 @@ class DocumentSummaryGenerator:
             )
         elif self.llm_provider == 'langchain-aws-bedrock':
             pass
+        elif self.llm_provider == 'llama-index-openai':
+            from llama_index.llms.openai import OpenAI
+            llm = OpenAI(self.llm_model_name)
+        elif self.llm_provider == 'llama-index-togetherai':
+            from llama_index.llms.together import TogetherLLM
+            llm = TogetherLLM(model=self.llm_model_name)
         return llm
 
     def get_embed_model(self):
@@ -120,65 +134,52 @@ class DocumentSummaryGenerator:
         elif self.embedding_provider == 'langchain-aws-bedrock':
             pass
 
+    def get_response_synthesizer(self):
+        query_template_str = self.summary_template_str
+        query_template = SelectorPromptTemplate(
+            default_template=PromptTemplate(
+                query_template_str, prompt_type=PromptType.SUMMARY
+            ),
+        )
+        response_synthesizer = get_response_synthesizer(response_mode=self.response_mode,
+                                                        summary_template=query_template,
+                                                        prompt_helper=PromptHelper.from_llm_metadata(self.llm.metadata,
+                                                                                                     chunk_size_limit=self.llm.metadata.context_window - 1000),
+                                                        verbose=True, streaming=self.streaming, use_async=self.use_async)
+        return response_synthesizer
+
     def get_documents(self) -> DocumentSummaryIndex:
-        llm = self.get_llm_model()
-        embed_model = self.get_embed_model()
-        Settings.llm = llm
-        Settings.embed_model = embed_model
         if not os.path.exists(self.output_dir + '/docstore.json') or self.refetch_blogs:
             print('Fetching Blogs ...')
             blogs = self.blog_fetcher.fetch_blogs()
-            # summary_generator = DocumentSummaryIndex.from_documents(documents=blogs[:2], show_progress=True,
-            #                                                        embed_summaries=False,
-            #                                                        )
-
             docstore = SimpleDocumentStore()
             docstore.add_documents(blogs)
             StorageContext.from_defaults(docstore=docstore).persist(self.output_dir)
-            index = VectorStoreIndex.from_documents(documents=blogs,
-                                                    show_progress=True)
-            # index.storage_context.persist(persist_dir=self.output_dir)
-            # summary_generator.storage_context.persist(persist_dir=self.output_dir)
         else:
             print('Using stored blogs content')
             docstore = SimpleDocumentStore().from_persist_dir(self.output_dir)
 
             # index = load_index_from_storage(
             #    storage_context=StorageContext.from_defaults(persist_dir=self.output_dir))
-        '''query_template_str = ("The contents of the blog are provided as Context information below.\n"
-                              "---------------------\n"
-                              "{context_str}\n"
-                              "---------------------\n"
-                              "Given the information from multiple sources and not prior knowledge, "
-                              "answer the query.\n"
-                              "Query: {query_str}\n"
-                              "Answer: ")
-        query_template = SelectorPromptTemplate(
-            default_template=PromptTemplate(
-                query_template_str, prompt_type=PromptType.SUMMARY
-            ),
-        )
         '''
-        response_synthesizer = get_response_synthesizer(response_mode=ResponseMode.TREE_SUMMARIZE,
-                                                        prompt_helper=PromptHelper.from_llm_metadata(llm.metadata,
-                                                                                                     chunk_size_limit=llm.metadata.context_window - 1000),
-                                                        verbose=True)
+        '''
+
         # query_engine = RetrieverQueryEngine(retriever=index.as_retriever(), response_synthesizer=response_synthesizer)
         # query_engine.query('Generate a summary of the blog. Find below the contents of the blog ')
-        return (docstore, response_synthesizer)
+        return docstore
 
     def get_titles(self):
-        docstore, response_synthesizer = self.get_documents()
-        self.docstore = docstore
-        self.response_synthesizer = response_synthesizer
-        return list(docstore.docs.keys())
+        return list(self.docstore.docs.keys())
 
-    def get_summary(self, doc_id):
-        d = self.docstore.get_document(doc_id=doc_id)
-        if 'summary' in d.metadata.keys():
-            response = d.metadata['summary']
-        else:
-            query_engine = SummaryQueryEngine(docstore=self.docstore, response_synthesizer=self.response_synthesizer)
-            response = query_engine.query(str_or_query_bundle=doc_id)
-            d.metadata['summary'] = response
+    def get_summary_response(self, doc_id):
+        response = self.query_engine.query(str_or_query_bundle=doc_id)
         return response
+
+    def get_summary_txt(self):
+        response = self.get_summary_response()
+        streaming = isinstance(response, StreamingResponse)
+        if streaming:
+            response_txt = response.get_response()
+        else:
+            response_txt = str(response)
+        return response_txt
