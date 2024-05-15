@@ -60,6 +60,18 @@ class DocumentSummaryGenerator:
             print('Exception occured while creating the specified query engine:' + str(e))
 
     def get_response_synthesizer(self) -> BaseSynthesizer:
+        """
+                    Initialize LLM observability with deepeval platform.
+
+                    Parameters:
+
+                    Returns:
+
+                    Examples:
+
+                    Notes:
+
+                """
         query_template_str = self.summary_template_str
         query_template = SelectorPromptTemplate(
             default_template=PromptTemplate(
@@ -75,6 +87,18 @@ class DocumentSummaryGenerator:
         return response_synthesizer
 
     def get_documents(self) -> SimpleDocumentStore:
+        """
+                    Initialize LLM observability with deepeval platform.
+
+                    Parameters:
+
+                    Returns:
+
+                    Examples:
+
+                    Notes:
+
+                """
         if not os.path.exists(self.output_dir + '/docstore.json') or self.refetch_blogs:
             print('Fetching Blogs ...')
             blogs = self.blog_fetcher.fetch_blogs()
@@ -88,9 +112,33 @@ class DocumentSummaryGenerator:
             return docstore
 
     def get_titles(self) -> List[str]:
+        """
+                    Initialize LLM observability with deepeval platform.
+
+                    Parameters:
+
+                    Returns:
+
+                    Examples:
+
+                    Notes:
+
+                """
         return list(self.docstore.docs.keys())
 
     def get_summary_response(self, doc_id: str) -> Union[StreamingResponse, Response]:
+        """
+                    Initialize LLM observability with deepeval platform.
+
+                    Parameters:
+
+                    Returns:
+
+                    Examples:
+
+                    Notes:
+
+                """
         response = self.query_engine.query(str_or_query_bundle=doc_id)
         # self.observability.collect_save_traces()
         return response

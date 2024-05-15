@@ -19,6 +19,18 @@ class BlogCustomRetriever(BaseRetriever):
         super().__init__()
 
     def _retrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
+        """
+                    Initialize LLM observability with deepeval platform.
+
+                    Parameters:
+
+                    Returns:
+
+                    Examples:
+
+                    Notes:
+
+                """
         """Retrieve nodes given query."""
         document = self._docstore.get_document(doc_id=query_bundle.query_str)
         nodes = [NodeWithScore(node=node, score=1.0) for node in

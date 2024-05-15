@@ -21,6 +21,18 @@ class LLMProvider:
         self.stopping_ids = stopping_ids
 
     def get_llm_model(self) -> LLM:
+        """
+                    Initialize LLM observability with deepeval platform.
+
+                    Parameters:
+
+                    Returns:
+
+                    Examples:
+
+                    Notes:
+
+                """
         # option to use llm from different sources, HuggingFace, Langchain, AWS, etc.
         # API provided by Together-AI is used to build and test this project
         llm = MockLLM()

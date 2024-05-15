@@ -6,6 +6,18 @@ import pandas as pd
 
 
 def make_simple_eval_dataset() -> EvaluationDataset:
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     test_case = LLMTestCase(
         input="What if these shoes don't fit?",
         actual_output="We offer a 30-day full refund at no extra cost.",
@@ -16,6 +28,18 @@ def make_simple_eval_dataset() -> EvaluationDataset:
 
 
 def make_random_blog_eval_dataset(num_queries: int = 4) -> EvaluationDataset:
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     from SummaryGen.blog_summarizer import DocumentSummaryGenerator
     from config import Config
     import random
@@ -39,6 +63,18 @@ def make_random_blog_eval_dataset(num_queries: int = 4) -> EvaluationDataset:
 
 def make_eval_dataset_from_phoenix_df(span_df: pd.DataFrame = None,
                                       remove_duplicates: bool = True) -> EvaluationDataset:
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     test_cases = []
     if span_df is None:
         try:

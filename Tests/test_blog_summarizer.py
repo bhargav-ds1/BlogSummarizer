@@ -26,6 +26,18 @@ print(len(evaluation_dataset.test_cases))
     evaluation_dataset,
 )
 def test_answer_relevancy(test_case: LLMTestCase):
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     answer_relevancy_metric = AnswerRelevancyMetric(threshold=0.5, model=custom_eval_llm_model)
     assert_test(test_case, [answer_relevancy_metric])
 
@@ -35,6 +47,18 @@ def test_answer_relevancy(test_case: LLMTestCase):
     evaluation_dataset,
 )
 def test_summarization(test_case: LLMTestCase):
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     summarization_metric = SummarizationMetric(threshold=0.5, model=custom_eval_llm_model)
     assert_test(test_case, metrics=[summarization_metric])
 
@@ -44,6 +68,18 @@ def test_summarization(test_case: LLMTestCase):
     evaluation_dataset,
 )
 def test_faithfulness(test_case: LLMTestCase):
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     faithfulness_metric = FaithfulnessMetric(threshold=0.5, model=custom_eval_llm_model)
     assert_test(test_case, metrics=[faithfulness_metric])
 
@@ -53,6 +89,18 @@ def test_faithfulness(test_case: LLMTestCase):
     evaluation_dataset,
 )
 def test_hallucination(test_case: LLMTestCase):
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     hallucination_metric = HallucinationMetric(threshold=0.5, model=custom_eval_llm_model)
     assert_test(test_case, metrics=[hallucination_metric])
 
@@ -62,5 +110,17 @@ def test_hallucination(test_case: LLMTestCase):
     evaluation_dataset,
 )
 def test_toxicity(test_case: LLMTestCase):
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     toxicity_metric = ToxicityMetric(threshold=0.5, model=custom_eval_llm_model)
     assert_test(test_case, metrics=[toxicity_metric])

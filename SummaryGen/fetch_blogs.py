@@ -14,6 +14,18 @@ class FetchBlogs:
         self.base_url = 'https://jobleads.com'
 
     def _get_blog_text(self, link: str) -> str:
+        """
+                    Initialize LLM observability with deepeval platform.
+
+                    Parameters:
+
+                    Returns:
+
+                    Examples:
+
+                    Notes:
+
+                """
         blog = requests.get(self.base_url + link)
         soup = BeautifulSoup(blog.content, "html.parser")
         blog_text = soup.find(['div'], {'class': 'article-blog__content'}).text
@@ -21,6 +33,18 @@ class FetchBlogs:
         return blog_text.strip()
 
     def fetch_blogs(self) -> List[Document]:
+        """
+                    Initialize LLM observability with deepeval platform.
+
+                    Parameters:
+
+                    Returns:
+
+                    Examples:
+
+                    Notes:
+
+                """
         page = requests.get(self.base_url + '/career-advice')
         soup = BeautifulSoup(page.content, "html.parser")
         tags = soup.find_all("a", {"class": 'article-list__item'})
@@ -41,6 +65,18 @@ class FetchBlogs:
 
     @staticmethod
     def save_blogs(documents: List[Document], dir_name: str = 'Data/DataStore') -> None:
+        """
+                    Initialize LLM observability with deepeval platform.
+
+                    Parameters:
+
+                    Returns:
+
+                    Examples:
+
+                    Notes:
+
+                """
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
         docstore = SimpleDocumentStore()

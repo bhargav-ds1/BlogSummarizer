@@ -17,12 +17,36 @@ from llama_index.core.base.response.schema import StreamingResponse
 
 @st.cache_resource
 def get_document_summarizer() -> Tuple[DocumentSummaryGenerator, List]:
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     document_summarizer = DocumentSummaryGenerator(**Config['summarizer_args'], **Config['query_engine_args'])
     titles = document_summarizer.get_titles()
     return document_summarizer, titles
 
 
 def makeStreamlitApp() -> None:
+    """
+                Initialize LLM observability with deepeval platform.
+
+                Parameters:
+
+                Returns:
+
+                Examples:
+
+                Notes:
+
+            """
     # Maintain a messages dict in session_state to avoid re-querying the summary of a blog every time it is selected
     if 'messages' not in st.session_state:
         st.session_state.messages = {}
