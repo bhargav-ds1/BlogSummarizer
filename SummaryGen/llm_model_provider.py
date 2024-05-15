@@ -1,6 +1,8 @@
 from llama_index.core.llms import LLM
+
+
 class LLMProvider:
-    def __init__(self,llm_provider: str, llm_model_name: str, llm_model_path: str= None,
+    def __init__(self, llm_provider: str, llm_model_name: str, llm_model_path: str = None,
                  offload_dir: str = './offload_dir', cache_dir: str = None,
                  local_files_only: bool = False, context_window: int = 4096, max_new_tokens: int = 256,
                  generate_kwargs: dict = None, tokenizer_max_length: int = 4096,
@@ -55,8 +57,5 @@ class LLMProvider:
             llm = OpenAI(self.llm_model_name)
         elif self.llm_provider == 'llama-index-togetherai':
             from llama_index.llms.together import TogetherLLM
-            llm = TogetherLLM(model=self.llm_model_name,)
+            llm = TogetherLLM(model=self.llm_model_name, )
         return llm
-
-
-
