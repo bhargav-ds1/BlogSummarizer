@@ -14,19 +14,25 @@ from SummaryGen.blog_summarizer import DocumentSummaryGenerator
 from config import Config
 from llama_index.core.base.response.schema import StreamingResponse
 
+"""
+This module is run using streamlit CLI command from the project root.
+'Streamlit run Apps/Streamlit_app/app.py'
+This renders the UI at http://localhost:8501/
+"""
 
 @st.cache_resource
 def get_document_summarizer() -> Tuple[DocumentSummaryGenerator, List]:
     """
-                Initialize LLM observability with deepeval platform.
+                This function connects to the Summary generator and provides an object along with a list of blog titles
 
                 Parameters:
 
                 Returns:
-
-                Examples:
-
+                    - DocumentSummaryGenerator (object), list of blog titles
                 Notes:
+                    - As, streamlit re-runs the whole application for every change. To avoid re-running the summary generator,
+                this function result is cached by using the cache_resource decorator.
+
 
             """
     document_summarizer = DocumentSummaryGenerator(**Config['summarizer_args'], **Config['query_engine_args'])
@@ -36,17 +42,9 @@ def get_document_summarizer() -> Tuple[DocumentSummaryGenerator, List]:
 
 def makeStreamlitApp() -> None:
     """
-                Initialize LLM observability with deepeval platform.
-
-                Parameters:
-
-                Returns:
-
-                Examples:
-
-                Notes:
-
-            """
+                The UI of the streamlit app is built in this function. Which includes blog selection from a list of
+                blogs and rendering the summary.
+    """
     # Maintain a messages dict in session_state to avoid re-querying the summary of a blog every time it is selected
     if 'messages' not in st.session_state:
         st.session_state.messages = {}
@@ -96,4 +94,7 @@ def makeStreamlitApp() -> None:
 
 
 if __name__ == '__main__':
+    """
+    Entrypoint to the streamlit application.
+    """
     makeStreamlitApp()
