@@ -7,7 +7,7 @@ st.set_page_config(  # Added favicon and title to the web app
 )
 import os
 import sys
-from typing import List
+from typing import List, Tuple
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from SummaryGen.blog_summarizer import DocumentSummaryGenerator
 from config import Config
@@ -15,7 +15,7 @@ from llama_index.core.base.response.schema import StreamingResponse
 
 
 @st.cache_resource
-def get_document_summarizer() -> (DocumentSummaryGenerator, List):
+def get_document_summarizer() -> Tuple[DocumentSummaryGenerator, List]:
     document_summarizer = DocumentSummaryGenerator(**Config['summarizer_args'], **Config['query_engine_args'])
     titles = document_summarizer.get_titles()
     return document_summarizer, titles
