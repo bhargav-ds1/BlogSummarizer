@@ -1,6 +1,6 @@
 from llama_index.core import Settings, StorageContext
-from llama_index.core import DocumentSummaryIndex
-from llama_index.core.response_synthesizers import ResponseMode, get_response_synthesizer
+from typing import List, Union
+from llama_index.core.response_synthesizers import ResponseMode, get_response_synthesizer, BaseSynthesizer
 from llama_index.core.indices.prompt_helper import PromptHelper
 from SummaryGen.fetch_blogs import FetchBlogs
 from llama_index.core.storage.docstore import SimpleDocumentStore
@@ -8,7 +8,7 @@ from llama_index.core.prompts import SelectorPromptTemplate
 from llama_index.core.prompts.base import PromptTemplate
 from llama_index.core.prompts.prompt_type import PromptType
 import llama_index.core.query_engine as qe
-from llama_index.core.base.response.schema import StreamingResponse
+from llama_index.core.base.response.schema import StreamingResponse, Response
 from Observability import InitializeObservability
 from dotenv import load_dotenv
 import os
@@ -29,7 +29,7 @@ class DocumentSummaryGenerator:
         self.observability = InitializeObservability(observ_provider=observ_provider)
         self.blog_fetcher = FetchBlogs()
         self.refetch_blogs = refetch_blogs
-        self.output_dir = os.path.join(root_dir,output_dir)
+        self.output_dir = os.path.join(root_dir, output_dir)
         self.summary_template_str = summary_template_str
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
@@ -48,7 +48,7 @@ class DocumentSummaryGenerator:
         self.docstore = self.get_documents()
 
         self.retriever = BlogCustomRetriever(docstore=self.docstore, chunk_size=self.chunk_size,
-                                         chunk_overlap=self.chunk_overlap)
+                                             chunk_overlap=self.chunk_overlap)
         if hasattr(qe, query_engine_type):
             self.query_engine_type = getattr(qe, query_engine_type)
         else:
@@ -59,8 +59,7 @@ class DocumentSummaryGenerator:
         except Exception as e:
             print('Exception occured while creating the specified query engine:' + str(e))
 
-
-    def get_response_synthesizer(self):
+    def get_response_synthesizer(self) -> BaseSynthesizer:
         query_template_str = self.summary_template_str
         query_template = SelectorPromptTemplate(
             default_template=PromptTemplate(
@@ -75,7 +74,7 @@ class DocumentSummaryGenerator:
                                                         use_async=self.use_async)
         return response_synthesizer
 
-    def get_documents(self) -> DocumentSummaryIndex:
+    def get_documents(self) -> SimpleDocumentStore:
         if not os.path.exists(self.output_dir + '/docstore.json') or self.refetch_blogs:
             print('Fetching Blogs ...')
             blogs = self.blog_fetcher.fetch_blogs()
@@ -86,24 +85,17 @@ class DocumentSummaryGenerator:
             print('Using stored blogs content')
             docstore = SimpleDocumentStore().from_persist_dir(self.output_dir)
 
-            # index = load_index_from_storage(
-            #    storage_context=StorageContext.from_defaults(persist_dir=self.output_dir))
-        '''
-        '''
+            return docstore
 
-        # query_engine = RetrieverQueryEngine(retriever=index.as_retriever(), response_synthesizer=response_synthesizer)
-        # query_engine.query('Generate a summary of the blog. Find below the contents of the blog ')
-        return docstore
-
-    def get_titles(self):
+    def get_titles(self) -> List[str]:
         return list(self.docstore.docs.keys())
 
-    def get_summary_response(self, doc_id):
+    def get_summary_response(self, doc_id: str) -> Union[StreamingResponse, Response]:
         response = self.query_engine.query(str_or_query_bundle=doc_id)
-        #self.observability.collect_save_traces()
+        # self.observability.collect_save_traces()
         return response
 
-    def get_summary_txt(self):
+    def get_summary_txt(self) -> str:
         response = self.get_summary_response()
         streaming = isinstance(response, StreamingResponse)
         if streaming:
@@ -111,5 +103,3 @@ class DocumentSummaryGenerator:
         else:
             response_txt = str(response)
         return response_txt
-
-
