@@ -2,9 +2,10 @@ from deepeval.test_case import LLMTestCase
 from deepeval.dataset import EvaluationDataset
 import phoenix as px
 from llama_index.core.base.response.schema import StreamingResponse
+import pandas as pd
 
 
-def make_simple_eval_dataset():
+def make_simple_eval_dataset() -> EvaluationDataset:
     test_case = LLMTestCase(
         input="What if these shoes don't fit?",
         actual_output="We offer a 30-day full refund at no extra cost.",
@@ -14,7 +15,7 @@ def make_simple_eval_dataset():
     return EvaluationDataset(test_cases=[test_case])
 
 
-def make_random_blog_eval_dataset(num_queries: int = 4):
+def make_random_blog_eval_dataset(num_queries: int = 4) -> EvaluationDataset:
     from SummaryGen.blog_summarizer import DocumentSummaryGenerator
     from config import Config
     import random
@@ -37,7 +38,8 @@ def make_random_blog_eval_dataset(num_queries: int = 4):
         return EvaluationDataset(test_cases=test_cases)
 
 
-def make_eval_dataset_from_phoenix_df(span_df=None, remove_duplicates=True):
+def make_eval_dataset_from_phoenix_df(span_df: pd.DataFrame = None,
+                                      remove_duplicates: bool = True) -> EvaluationDataset:
     test_cases = []
     if span_df is None:
         try:
@@ -63,9 +65,3 @@ def make_eval_dataset_from_phoenix_df(span_df=None, remove_duplicates=True):
             )
         )
     return EvaluationDataset(test_cases=test_cases)
-
-
-from phoenix.trace import TraceDataset
-
-if __name__ == '__main__':
-    dataset = make_blog_eval_dataset(num_queries=2)

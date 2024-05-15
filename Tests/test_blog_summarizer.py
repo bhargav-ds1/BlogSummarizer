@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from deepeval import assert_test
 from deepeval.test_case import LLMTestCase
@@ -18,6 +19,7 @@ load_dotenv(root_dir + '/.envfile')
 custom_eval_llm_model = CustomEvaluationModel(model=LLMProvider(**Config['eval_model_args']).get_llm_model())
 evaluation_dataset = make_random_blog_eval_dataset(num_queries=2)
 print(len(evaluation_dataset.test_cases))
+
 
 @pytest.mark.parametrize(
     "test_case",
@@ -62,7 +64,3 @@ def test_hallucination(test_case: LLMTestCase):
 def test_toxicity(test_case: LLMTestCase):
     toxicity_metric = ToxicityMetric(threshold=0.5, model=custom_eval_llm_model)
     assert_test(test_case, metrics=[toxicity_metric])
-
-
-if __name__ == '__main__':
-    test_answer_relevancy()
