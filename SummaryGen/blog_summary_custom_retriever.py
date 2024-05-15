@@ -1,11 +1,9 @@
-from llama_index.core.query_engine import CustomQueryEngine
-from llama_index.core.response_synthesizers import BaseSynthesizer
+from typing import List
+
 from llama_index.core.node_parser import SentenceSplitter
+from llama_index.core.retrievers import BaseRetriever
 from llama_index.core.schema import NodeWithScore, QueryBundle
 from llama_index.core.storage.docstore import SimpleDocumentStore
-from llama_index.core.query_engine.custom import STR_OR_RESPONSE_TYPE
-from llama_index.core.retrievers import BaseRetriever
-from typing import List
 
 
 class BlogCustomRetriever(BaseRetriever):

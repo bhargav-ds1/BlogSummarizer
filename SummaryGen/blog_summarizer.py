@@ -18,7 +18,7 @@ from SummaryGen.llm_model_provider import LLMProvider
 
 class DocumentSummaryGenerator:
     def __init__(self, llm_args: dict = None,
-                 refetch_blogs: bool = False, output_dir: str = None, query_engine_type: qe.BaseQueryEngine = None,
+                 refetch_blogs: bool = False, output_dir: str = None, query_engine_type: str = None,
                  query_engine_kwargs: dict = None, response_mode: str = 'tree_summarize',
                  chunk_size: int = 1024, chunk_overlap: int = 128,
                  streaming: bool = False, summary_template_str: str = None, use_async: bool = False,
@@ -94,12 +94,3 @@ class DocumentSummaryGenerator:
         response = self.query_engine.query(str_or_query_bundle=doc_id)
         # self.observability.collect_save_traces()
         return response
-
-    def get_summary_txt(self) -> str:
-        response = self.get_summary_response()
-        streaming = isinstance(response, StreamingResponse)
-        if streaming:
-            response_txt = response.get_response()
-        else:
-            response_txt = str(response)
-        return response_txt

@@ -1,4 +1,4 @@
-# Configuration file to control the flow
+# Configuration file which is used by the apps to define the parameters of the blog Summarizer
 
 Config = {
     'summarizer_args': {'llm_args': {'llm_provider': 'llama-index-togetherai',

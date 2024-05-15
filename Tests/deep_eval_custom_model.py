@@ -1,7 +1,7 @@
+from typing import Coroutine, Any
+
 from deepeval.models import DeepEvalBaseLLM
 from llama_index.core.llms import LLM
-from typing import Tuple, Coroutine, Any
-from tenacity import retry, retry_if_exception_type, wait_exponential_jitter
 
 
 class CustomEvaluationModel(DeepEvalBaseLLM):

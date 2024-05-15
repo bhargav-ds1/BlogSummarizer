@@ -1,4 +1,5 @@
 from llama_index.core.llms import LLM
+from llama_index.core.llms.mock import MockLLM
 
 
 class LLMProvider:
@@ -22,6 +23,7 @@ class LLMProvider:
     def get_llm_model(self) -> LLM:
         # option to use llm from different sources, HuggingFace, Langchain, AWS, etc.
         # API provided by Together-AI is used to build and test this project
+        llm = MockLLM()
         if self.llm_provider == 'langchain-openai':
             pass
         elif self.llm_provider == 'llama-index-huggingface':
@@ -57,5 +59,7 @@ class LLMProvider:
             llm = OpenAI(self.llm_model_name)
         elif self.llm_provider == 'llama-index-togetherai':
             from llama_index.llms.together import TogetherLLM
-            llm = TogetherLLM(model=self.llm_model_name, )
+            llm = TogetherLLM(model=self.llm_model_name)
+        else:
+            print('Please provide a valid LLM provider. Using mock LLM, this might result in unexpected results.')
         return llm

@@ -20,16 +20,6 @@ class FetchBlogs:
         # can also remove the explore more articles section at the end of each blog post
         return blog_text.strip()
 
-    def get_titles(self, docs: List[Document] = None) -> List[str]:
-        if docs:
-            return [doc._id for doc in docs]
-        elif os.path.exists(self.output_dir) and os.path.exists(self.output_dir + '/docstore.json'):
-            blogs = SimpleDocumentStore().from_persist_dir(self.output_dir).docs
-            return [doc.id_ for doc in blogs]
-        else:
-            blogs = self.fetch_blogs()
-            return [doc._id for doc in blogs]
-
     def fetch_blogs(self) -> List[Document]:
         page = requests.get(self.base_url + '/career-advice')
         soup = BeautifulSoup(page.content, "html.parser")
@@ -49,7 +39,8 @@ class FetchBlogs:
             )
         return self.docs
 
-    def save_blogs(self, documents: List[Document], dir_name: str = 'Data/DataStore') -> None:
+    @staticmethod
+    def save_blogs(documents: List[Document], dir_name: str = 'Data/DataStore') -> None:
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
         docstore = SimpleDocumentStore()

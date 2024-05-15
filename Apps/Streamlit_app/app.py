@@ -1,13 +1,14 @@
 import streamlit as st
+import os
+import sys
+from typing import List, Tuple
+
 st.set_page_config(  # Added favicon and title to the web app
     page_title="Blog Summariser",
     page_icon='favicon.ico',
     layout="wide",
     initial_sidebar_state="expanded",
 )
-import os
-import sys
-from typing import List, Tuple
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from SummaryGen.blog_summarizer import DocumentSummaryGenerator
 from config import Config
@@ -34,7 +35,7 @@ def makeStreamlitApp() -> None:
                                options=titles, index=None, placeholder='Choose an option',
                                help='Select one of the titles of the blog to generate a summary of it.')
     st.header(str(blog_id) if blog_id else '', divider='rainbow')
-    m = st.markdown("""
+    st.markdown("""
     <style>
     div.stButton > button:first-child {
         background-color: aliceblue;
