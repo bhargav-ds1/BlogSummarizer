@@ -6,10 +6,13 @@ st.set_page_config(  # Added favicon and title to the web app
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from SummaryGen.blog_summarizer import DocumentSummaryGenerator
 from config import Config
 from llama_index.core.base.response.schema import StreamingResponse
+
 
 @st.cache_resource
 def get_document_summarizer():
@@ -28,12 +31,31 @@ def makeStreamlitApp():
     st.title('Summary Generator')
     with st.sidebar:
         blog_id = st.selectbox('Select a blog to summarize',
-                               options=titles)
-    st.header(str(blog_id), divider='rainbow')
+                               options=titles, index=None, placeholder='Choose an option',
+                               help='Select one of the titles of the blog to generate a summary of it.')
+    st.header(str(blog_id) if blog_id else '', divider='rainbow')
+    m = st.markdown("""
+    <style>
+    div.stButton > button:first-child {
+        background-color: aliceblue;
+        border:none;
+        color:black
+    }
+    div.stButton > button:hover {
+        background-color: darkgray;
+        border:none;
+        color:black
+        }
+    </style>""", unsafe_allow_html=True)
+    columns = st.columns([11, 1])
+    with columns[1]:
+        st.button('  ↻  ', on_click=lambda: st.session_state.messages.pop(blog_id))
     if blog_id in st.session_state.messages.keys():
         response = st.session_state.messages[blog_id]
-    else:
+    elif blog_id:
         response = document_summarizer.get_summary_response(doc_id=blog_id)
+    else:
+        response = ''
     streaming = isinstance(response, StreamingResponse)
     if streaming:
         message_placeholder = st.empty()

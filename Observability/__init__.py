@@ -1,1 +1,1 @@
-from Observability.initializeObservability import InitializeObservability
+from Observability.initialize_observability import InitializeObservability

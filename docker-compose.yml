@@ -1,0 +1,15 @@
+services:
+  blog_summarizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: blog_summarizer
+    restart: unless-stopped
+    command: streamlit run Apps/Streamlit_app/app.py
+    volumes:
+      - .:/code
+    env_file:
+      - ./.envfile
+    ports:
+      - 8501:8501
+      - 6006:6006
