@@ -1,5 +1,4 @@
 import streamlit as st
-
 st.set_page_config(  # Added favicon and title to the web app
     page_title="Blog Summariser",
     page_icon='favicon.ico',
@@ -8,6 +7,7 @@ st.set_page_config(  # Added favicon and title to the web app
 )
 import os
 import sys
+from typing import List
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from SummaryGen.blog_summarizer import DocumentSummaryGenerator
 from config import Config
@@ -15,13 +15,13 @@ from llama_index.core.base.response.schema import StreamingResponse
 
 
 @st.cache_resource
-def get_document_summarizer():
+def get_document_summarizer() -> (DocumentSummaryGenerator, List):
     document_summarizer = DocumentSummaryGenerator(**Config['summarizer_args'], **Config['query_engine_args'])
     titles = document_summarizer.get_titles()
     return document_summarizer, titles
 
 
-def makeStreamlitApp():
+def makeStreamlitApp() -> None:
     # Maintain a messages dict in session_state to avoid re-querying the summary of a blog every time it is selected
     if 'messages' not in st.session_state:
         st.session_state.messages = {}
@@ -69,6 +69,3 @@ def makeStreamlitApp():
         st.markdown(response)
         st.session_state.messages[blog_id] = response
 
-
-if __name__ == '__main__':
-    makeStreamlitApp()

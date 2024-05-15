@@ -1,4 +1,3 @@
-from transformers import AutoModelForCausalLM
 from llama_index.core import Settings, StorageContext
 from llama_index.core import DocumentSummaryIndex
 from llama_index.core.response_synthesizers import ResponseMode, get_response_synthesizer
@@ -23,8 +22,7 @@ class DocumentSummaryGenerator:
                  query_engine_kwargs: dict = None, response_mode: str = 'tree_summarize',
                  chunk_size: int = 1024, chunk_overlap: int = 128,
                  streaming: bool = False, summary_template_str: str = None, use_async: bool = False,
-                 observ_provider: str = 'phoenix', eval_provider: str = 'phoenix', eval_model_provider: str = 'phoenix',
-                 eval_model_name: str = 'meta-llama/Llama-3-8b-chat-hf'):
+                 observ_provider: str = 'phoenix'):
         super().__init__()
         root_dir = os.path.dirname(os.path.dirname(__file__))
         load_dotenv(root_dir + '/.envfile')
@@ -48,10 +46,7 @@ class DocumentSummaryGenerator:
         self.response_synthesizer = self.get_response_synthesizer()
         ##############################
         self.docstore = self.get_documents()
-        # self.query_engine = BlogSummaryQueryEngine(docstore=self.docstore,
-        #                                           response_synthesizer=self.response_synthesizer,
-        #                                           chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap,
-        #                                           )
+
         self.retriever = BlogCustomRetriever(docstore=self.docstore, chunk_size=self.chunk_size,
                                          chunk_overlap=self.chunk_overlap)
         if hasattr(qe, query_engine_type):
@@ -64,17 +59,6 @@ class DocumentSummaryGenerator:
         except Exception as e:
             print('Exception occured while creating the specified query engine:' + str(e))
 
-    def get_embed_model(self):
-        if self.embedding_provider == 'langchain-openai':
-            pass
-        elif self.embedding_provider == 'langchain-huggingface':
-            from langchain_community.embeddings import HuggingFaceEmbeddings
-            return HuggingFaceEmbeddings(model_name=self.embedding_model_name)
-        elif self.embedding_provider == 'llama-index-huggingface':
-            from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-            return HuggingFaceEmbedding(model_name=self.embedding_model_name, cache_folder=self.embedding_model_path)
-        elif self.embedding_provider == 'langchain-aws-bedrock':
-            pass
 
     def get_response_synthesizer(self):
         query_template_str = self.summary_template_str

@@ -25,21 +25,21 @@ class InitializeObservability(DefaultObservability):
         if self.observ_provider == 'phoenix':
             self.initializePhoenix()
 
-    def initializeDeepEval(self):
+    def initializeDeepEval(self) -> None:
         from llama_index.callbacks.deepeval import deepeval_callback_handler
         from llama_index.core.callbacks import CallbackManager
         CallbackManager([deepeval_callback_handler()])
         from llama_index.callbacks.arize_phoenix import arize_phoenix_callback_handler
         # set_global_handler('deepeval')
 
-    def initializeSimple(self):
+    def initializeSimple(self) -> None:
         set_global_handler('simple')
 
-    def initializePhoenix(self):
+    def initializePhoenix(self) -> None:
         px.launch_app()
         llama_index.core.set_global_handler("arize_phoenix")
 
-    def collect_save_traces(self):
+    def collect_save_traces(self) -> None:
         if self.observ_provider == 'phoenix':
             file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                      'Tests/phoenix_span_dataset.csv')
