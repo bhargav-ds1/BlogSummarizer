@@ -1,28 +1,26 @@
-# import logging
-# import sys
 import requests
-import pandas as pd
-# logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-# logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 from bs4 import BeautifulSoup
-import os, time
+from typing import List
+import os
 from llama_index.core.schema import Document
 from llama_index.core.storage.docstore import SimpleDocumentStore
 from llama_index.core import StorageContext
 from tqdm import tqdm
 
+
 class FetchBlogs:
-    def __init__(self):
+    def __init__(self) -> None:
         self.docs = []
         self.base_url = 'https://jobleads.com'
+
     def _get_blog_text(self, link: str) -> str:
         blog = requests.get(self.base_url + link)
         soup = BeautifulSoup(blog.content, "html.parser")
         blog_text = soup.find(['div'], {'class': 'article-blog__content'}).text
-        # can also remove the explore more articles section
+        # can also remove the explore more articles section at the end of each blog post
         return blog_text.strip()
 
-    def get_titles(self, docs: list[Document] = None) -> list[str]:
+    def get_titles(self, docs: List[Document] = None) -> List[str]:
         if docs:
             return [doc._id for doc in docs]
         elif os.path.exists(self.output_dir) and os.path.exists(self.output_dir + '/docstore.json'):
@@ -32,7 +30,7 @@ class FetchBlogs:
             blogs = self.fetch_blogs()
             return [doc._id for doc in blogs]
 
-    def fetch_blogs(self):
+    def fetch_blogs(self) -> List[Document]:
         page = requests.get(self.base_url + '/career-advice')
         soup = BeautifulSoup(page.content, "html.parser")
         tags = soup.find_all("a", {"class": 'article-list__item'})
@@ -51,10 +49,9 @@ class FetchBlogs:
             )
         return self.docs
 
-    def save_blogs(self, documents, dir_name='Data/DataStore'):
+    def save_blogs(self, documents: List[Document], dir_name: str = 'Data/DataStore') -> None:
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
         docstore = SimpleDocumentStore()
         docstore.add_documents(documents)
         StorageContext.from_defaults(docstore=docstore).persist(persist_dir=dir_name)
-

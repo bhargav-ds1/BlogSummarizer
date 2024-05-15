@@ -14,7 +14,7 @@ class DefaultObservability:
 
 # optimize class design
 class InitializeObservability(DefaultObservability):
-    def __init__(self, observ_provider: Optional[str] = 'phoenix'):
+    def __init__(self, observ_provider: Optional[str] = 'phoenix') -> None:
         self.observ_provider = observ_provider
         if self.observ_provider not in self.observ_providers:
             raise ValueError('Observability provider should be one of ' + ','.join(self.observ_providers))

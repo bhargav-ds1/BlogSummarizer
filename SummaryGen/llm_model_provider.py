@@ -1,9 +1,10 @@
+from llama_index.core.llms import LLM
 class LLMProvider:
     def __init__(self,llm_provider: str, llm_model_name: str, llm_model_path: str= None,
                  offload_dir: str = './offload_dir', cache_dir: str = None,
                  local_files_only: bool = False, context_window: int = 4096, max_new_tokens: int = 256,
                  generate_kwargs: dict = None, tokenizer_max_length: int = 4096,
-                 stopping_ids: tuple[int] = (50278, 50279, 50277, 1, 0)):
+                 stopping_ids: tuple[int] = (50278, 50279, 50277, 1, 0)) -> None:
         self.llm_provider = llm_provider
         self.llm_model_name = llm_model_name
         self.llm_model_path = llm_model_path
@@ -16,8 +17,9 @@ class LLMProvider:
         self.tokenizer_max_length = tokenizer_max_length
         self.stopping_ids = stopping_ids
 
-    def get_llm_model(self):
+    def get_llm_model(self) -> LLM:
         # option to use llm from different sources, HuggingFace, Langchain, AWS, etc.
+        # API provided by Together-AI is used to build and test this project
         if self.llm_provider == 'langchain-openai':
             pass
         elif self.llm_provider == 'llama-index-huggingface':

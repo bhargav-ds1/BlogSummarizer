@@ -22,7 +22,7 @@ class DocumentSummaryGenerator:
                  query_engine_kwargs: dict = None, response_mode: str = 'tree_summarize',
                  chunk_size: int = 1024, chunk_overlap: int = 128,
                  streaming: bool = False, summary_template_str: str = None, use_async: bool = False,
-                 observ_provider: str = 'phoenix'):
+                 observ_provider: str = 'phoenix') -> None:
         super().__init__()
         root_dir = os.path.dirname(os.path.dirname(__file__))
         load_dotenv(root_dir + '/.envfile')
