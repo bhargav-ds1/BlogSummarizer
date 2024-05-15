@@ -69,3 +69,6 @@ def makeStreamlitApp() -> None:
         st.markdown(response)
         st.session_state.messages[blog_id] = response
 
+
+if __name__ == '__main__':
+    makeStreamlitApp()
