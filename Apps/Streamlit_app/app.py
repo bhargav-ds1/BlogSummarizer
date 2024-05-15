@@ -8,7 +8,7 @@ st.set_page_config(  # Added favicon and title to the web app
 )
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from SummaryGen.blog_summarizer import DocumentSummaryGenerator
 from config import Config
 from llama_index.core.base.response.schema import StreamingResponse

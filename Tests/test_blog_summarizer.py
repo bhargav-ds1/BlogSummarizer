@@ -8,7 +8,7 @@ from deepeval.metrics import (AnswerRelevancyMetric, SummarizationMetric, Faithf
 from .deep_eval_custom_model import CustomEvaluationModel
 from SummaryGen.llm_model_provider import LLMProvider
 from dotenv import load_dotenv
-from .testConfig import Config
+from .config_test import Config
 from .sample_test_case_generator import make_random_blog_eval_dataset
 import pytest
 

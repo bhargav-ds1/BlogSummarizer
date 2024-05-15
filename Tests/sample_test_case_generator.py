@@ -1,8 +1,7 @@
 from deepeval.test_case import LLMTestCase
 from deepeval.dataset import EvaluationDataset
 import phoenix as px
-import pandas as pd
-from phoenix.trace.trace_dataset import TraceDataset
+from llama_index.core.base.response.schema import StreamingResponse
 
 
 def make_simple_eval_dataset():
@@ -20,18 +19,22 @@ def make_random_blog_eval_dataset(num_queries: int = 4):
     from config import Config
     import random
 
-
     document_summarizer = DocumentSummaryGenerator(**Config['summarizer_args'], **Config['query_engine_args'])
     titles = document_summarizer.get_titles()
     blog_ids = random.sample(titles, num_queries)
+    responses = []
     for id in blog_ids:
-        document_summarizer.get_summary_response(doc_id=id)
+        responses.append(document_summarizer.get_summary_response(doc_id=id))
+    a = [response.get_response() if isinstance(response, StreamingResponse) else response for response in
+         responses]
+
     if document_summarizer.observability.observ_provider == 'phoenix':
         import phoenix as px
         span_df = px.active_session().get_spans_dataframe()
         return make_eval_dataset_from_phoenix_df(span_df=span_df)
     else:
-        return None
+        test_cases = [LLMTestCase(input=i, actual_output=j) for i, j in zip(titles, a)]
+        return EvaluationDataset(test_cases=test_cases)
 
 
 def make_eval_dataset_from_phoenix_df(span_df=None, remove_duplicates=True):
