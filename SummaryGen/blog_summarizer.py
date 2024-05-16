@@ -17,6 +17,46 @@ from SummaryGen.llm_model_provider import LLMProvider
 
 
 class DocumentSummaryGenerator:
+    """
+    A class to generate summaries for documents fetched from blogs based on various response modes and configurations.
+
+    Attributes:
+    - refetch_blogs (bool): Whether to refetch the blogs from the source.
+    - output_dir (str): Directory where the output and documents are stored.
+    - summary_template_str (str): Prompt template string for generating summaries.
+    - chunk_size (int): Size of the text chunk to process at one time.
+    - chunk_overlap (int): Overlap between consecutive chunks.
+    - streaming (bool): If True, enables streaming mode for response. Response will be streamed.
+    - use_async (bool): If True, enables asynchronous response synthesis.
+    - observ_provider (str): The provider for observability features.
+
+    Constructor Parameters:
+    - llm_args (dict, optional): Arguments to configure the language model.
+    - refetch_blogs (bool, optional): Flag to refetch blogs, defaults to False.
+    - output_dir (str, optional): Output directory path.
+    - query_engine_type (str, optional): Type of query engine to use.
+    - query_engine_kwargs (dict, optional): Additional kwargs for the query engine.
+    - response_mode (str, optional): Mode of response handling, defaults to 'tree_summarize'. 'simple_summarize' can
+    also be used as an alternative strategy.
+    - chunk_size (int, optional): Chunk size for processing, defaults to 1024.
+    - chunk_overlap (int, optional): Overlap size between chunks, defaults to 128.
+    - streaming (bool, optional): Enable streaming mode, defaults to False.
+    - summary_template_str (str, optional): Summary template string.
+    - use_async (bool, optional): Enable asynchronous mode for LLM call during response synthesis, defaults to False.
+    - observ_provider (str, optional): Observability provider, defaults to 'phoenix'.
+
+    Examples:
+    # Initialize the document summary generator with custom settings
+    generator = DocumentSummaryGenerator({
+        'model_name': 'gpt-3',
+        'temperature': 0.7
+    }, output_dir='/path/to/output', summary_template_str='Summarize: {content}')
+
+    Notes:
+    This class integrates various components like LLM, document retrieval, and query engines to provide a seamless
+    document summarization experience. Ensure that all dependencies and environment variables are properly set up.
+    """
+
     def __init__(self, llm_args: dict = None,
                  refetch_blogs: bool = False, output_dir: str = None, query_engine_type: str = None,
                  query_engine_kwargs: dict = None, response_mode: str = 'tree_summarize',
@@ -61,17 +101,16 @@ class DocumentSummaryGenerator:
 
     def get_response_synthesizer(self) -> BaseSynthesizer:
         """
-                    Initialize LLM observability with deepeval platform.
+            Returns the response synthesizer object by equipping it with the provided summary template, response mode,
+            and limits the context sizes to the upper limit of the LLM context.
 
-                    Parameters:
+            Returns:
+                - response synthesizer of type BaseSynthesizer
+            Notes:
+                - Different response modes can be used which changes the response created by the LLM. For the purpose
+                of generating summaries (simple_summarize and tree_summarize) response modes can be helpful.
 
-                    Returns:
-
-                    Examples:
-
-                    Notes:
-
-                """
+        """
         query_template_str = self.summary_template_str
         query_template = SelectorPromptTemplate(
             default_template=PromptTemplate(
@@ -88,17 +127,16 @@ class DocumentSummaryGenerator:
 
     def get_documents(self) -> SimpleDocumentStore:
         """
-                    Initialize LLM observability with deepeval platform.
+            Gets the blogs as documents and returns a SimpleDocumentStore object.
 
-                    Parameters:
+            Returns:
+                - docstore:SimpleDocumentStore which contains the blogs as documents.
+            Notes:
+                - While many advanced document stores could be used for storing and retrieving the documents.
+                A SimpleDocumentStore suffices the purpose of blog summary generation as no complex retrieval strategies
+                are required.
 
-                    Returns:
-
-                    Examples:
-
-                    Notes:
-
-                """
+        """
         if not os.path.exists(self.output_dir + '/docstore.json') or self.refetch_blogs:
             print('Fetching Blogs ...')
             blogs = self.blog_fetcher.fetch_blogs()
@@ -113,32 +151,29 @@ class DocumentSummaryGenerator:
 
     def get_titles(self) -> List[str]:
         """
-                    Initialize LLM observability with deepeval platform.
+            Returns the keys of the documents as the titles of the blogs.
+            Returns:
+                - list of blog titles
+            Notes:
+                - Depends on the get_documents and __init__ functions which gets and sets the docstore as a
+                SimpleDocumentStore value.
+                respectively.
 
-                    Parameters:
-
-                    Returns:
-
-                    Examples:
-
-                    Notes:
-
-                """
+        """
         return list(self.docstore.docs.keys())
 
     def get_summary_response(self, doc_id: str) -> Union[StreamingResponse, Response]:
         """
-                    Initialize LLM observability with deepeval platform.
+            queries the query_engine with the title of the blog to generate the response object containing the summary.
+            Parameters:
+                - id of the document which is the title of the blog.
 
-                    Parameters:
-
-                    Returns:
-
-                    Examples:
-
-                    Notes:
-
-                """
+            Returns:
+                - response object containing the response from the LLM. It can be either streaming or normal response
+            Notes:
+                - This method depends on the __init__ as the query engine along with the retriever, response_synthesizer
+                objects is created there.
+        """
         response = self.query_engine.query(str_or_query_bundle=doc_id)
         # self.observability.collect_save_traces()
         return response
