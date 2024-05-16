@@ -2,8 +2,9 @@
 
 ## Overview
 
-This project automates the summarization of blog posts from JobLeads website. It fetches blog posts, stores them in a
-Simple Document Store, and uses an LLM of choice to generate summaries. This implementation depends on the Llama index
+This project automates the summarization of blog posts on the JobLeads website. It fetches blog posts and stores them in
+a
+Simple Document Store uses an LLM of choice to generate summaries. This implementation depends on the Llama index
 framework.
 
 ## Features
@@ -14,15 +15,14 @@ framework.
 - **LLM-based Summarization**: Uses LLM models to create summaries. Tested with (meta-llama/Llama-2-7b-chat-hf,
   mistralai/Mixtral-8x7B-Instruct-v0.1) models downloaded from huggingface and LLM inference API provided by
   Together-AI.
-- **Custom Retrieval**: The retrieval for the summarization task is straight-forward, so a custom retriever which
+- **Custom Retrieval**: The retrieval for the summarization task is straight-forward, so a custom retriever, which
   retrieves the blog content based on the title of the blog is implemented. Optimally skipping the need to embed the
   data and retrieval based on embeddings.
-- **Summarization strategy**: Two strategies namely, simple_summarize and tree_summarize are tested. While
-  simple_summarize uses one single LLM call and truncates the data which exceeds the context length of the LLM.
-  tree_summarize strategy summarizes the chunks/nodes recursively forming a tree structured approach. It combines chunks
-  such that it can fill the context
-  length of the LLM for each LLM call, obtains summaries and summarizes them recursively until a single summary is
-  generated.
+- **Summarization strategy**: Two strategies, namely, simple_summarize and tree_summarize, are tested. While
+  simple_summarize uses one single LLM call and truncates the data, which exceeds the context length of the LLM.
+  The tree_summarize strategy summarizes the chunks or nodes recursively, forming a tree-structured approach. It
+  combines chunks such that it can fill the context length of the LLM for each LLM call, obtains summaries and
+  summarizes them recursively until a single summary is generated.
 - **Testing/Evaluation**: To evaluate the performance of the LLM in creating the summaries, a framework provided by
   confident-ai known as Deepeval is utilized. The performance is tested/evaluated by using relevant metrics such as
   AnswerRelevancyMetric, SummarizationMetric, FaithfulnessMetric, HallucinationMetric and ToxicityMetric.
@@ -36,15 +36,15 @@ framework.
 
 ## Project Boundaries
 
-- **Purpose**: The project aims only to summarize the blogs, so the application restricts its use only for summarization
-  purposes. (i.e user input is taken only in the form of selection.). While, it is tempting to have additional
-  functionality such as chatbot which can be used by the user to query the blog content it is treated as out of scope to
-  avoid introducing extra complications.
+- **Purpose**: The project aims only to summarize the blogs, so the application restricts its use only to summarization.
+  purposes. (i.e., user input is taken only in the form of selection.). While it is tempting to have additional
+  functionality such as a chatbot, which can be used by the user to query the blog content it is treated as out of scope
+  to avoid introducing extra complications and misuse.
 - **Manually initiate blog Re-Fetching**: The blogs are fetched automatically, but if a new blog is added to the
   website, then the blogs are to be refetched. This is done by setting a boolean variable in the config file. In future,
-  an event-driven approach which re-fetches when new blogs are added would be great to maintain timely data.
-- **LLM providers**: There are a lot of providers of LLMs which provide inference APIs to access and use LLMs. Only some
-  of the popular one's are considered in this project currently. The decision is biased to reduce or avoid incurring any
+  An event-driven approach that re-fetches when new blogs are added would be great to maintain timely data.
+- **LLM providers**: There are a lot of providers of LLMs that provide inference APIs to access and use LLMs. Only some
+  of the popular ones are considered in this project currently. The decision is biased to reduce or avoid incurring any
   charges.
 
 ## Prerequisites
@@ -137,7 +137,12 @@ DocumentSummaryGenerator class. It contains arguments related to sourcing and in
 along with arguments for the query_engine (aka, the summarizer which uses the LLM to generate summaries based on a
 strategy).
 
+Similarly, the testing module of the project also depends on a LLM to evaluate the responses. Usually, a different LLM
+other than the one used for generating responses is used for evaluation. The config_test.py file in the Tests package
+provides the configuration required for conducting the tests/evaluation.
+
 ## Examples
+
 **Example streamlit UI**
 ![](https://github.com/bhargav-ds1/BlogSummarizer/blob/main/Examples/streamlit_UI.png)
 **Example Phoenix observability UI**
@@ -146,6 +151,16 @@ strategy).
 ![](https://github.com/bhargav-ds1/BlogSummarizer/blob/main/Examples/deepeval_cmd.png)
 **Example deepeval evaluation UI**
 ![](https://github.com/bhargav-ds1/BlogSummarizer/blob/main/Examples/deepeval_UI.png)
+
+## What more can be done
+
+- Evaluation is implemented as part of tests, instead of that individual evaluation metrics can be calculated for each
+  summary generated and logged to the observability.
+- Different strategies and models can be compared for the summarization performance.
+- A LLM model can be fine-tuned on a curated dataset to optimize for blog summarization.
+- Blogs can be fetched based on event driven approach whenever new blogs are added to the website.
+- A Web-API can be developed which serves the summarization application.
+
 ## License
 
 This project is licensed under the Apache License - see the LICENSE.md file for details.
