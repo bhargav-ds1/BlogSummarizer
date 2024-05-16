@@ -1,8 +1,8 @@
 # Configuration file to perform tests
 
 Config = {
-    'eval_model_args': {'llm_provider': 'llama-index-togetherai',
-                        'llm_model_name': 'meta-llama/Llama-3-70b-chat-hf',
+    'eval_model_args': {'llm_provider': 'llama-index-togetherai',# llama-index-huggingface, llama-index-openai
+                        'llm_model_name': 'meta-llama/Llama-3-70b-chat-hf',# meta-llama/Llama-2-7b-chat-hf, gpt-3.5-turbo
                         'llm_model_path': '',
                         'offload_dir': './offload_dir',
                         'cache_dir': '/Users/bhargavvankayalapati/Work/InHouseRAG/InHouseRAG/Models/meta-llama/Llama-2-7b-chat-hf',
