@@ -49,7 +49,7 @@ class CustomEvaluationModel(DeepEvalBaseLLM):
         """
         return self.custom_model
 
-    def generate(self, prompt: str) -> Coroutine[Any, Any, str]:
+    def generate(self, prompt: str) -> str: #Coroutine[Any, Any, str]:
         """
             Asynchronously generates a response for a given prompt using the custom LLM.
 
@@ -62,7 +62,8 @@ class CustomEvaluationModel(DeepEvalBaseLLM):
                 Notes:
                     Same implementation for both async and non-async generation is used.
         """
-        return self.a_generate(prompt=prompt)
+        res = self.custom_model.complete(prompt)
+        return res.text
 
     async def a_generate(self, prompt: str) -> str:
         """

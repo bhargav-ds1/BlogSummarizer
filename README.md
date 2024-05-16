@@ -104,12 +104,15 @@ streamlit run Apps/Streamlit_app/app.py
 # or alternatively using the make command
 make start-app
 ```
-Alternatively, you can use the dockerized implementation by running 
+
+Alternatively, you can use the dockerized implementation by running
+
 ```bash
 docker compose up
 # or alternatively using the make command
 make start-docker
 ```
+
 The web UI can be accessed at (http://localhost:8501/)
 The phoenix observability UI can be accessed at (http://localhost:6006/)
 
@@ -120,13 +123,28 @@ deepeval test run Tests/test_blog_summarizer.py
 # or alternatively using the make command
 make start-test
 ```
+
 You can run `deepeval login` before running the test or uncomment the line containing the command in the make file if
 you would like to use the web UI to visualize the
 tests and have obtained relevant API key.
 
 ## Configuration
+
 Modify the settings via the config.py file.
+
+The configuration from the config.py file is used by the Apps (currently streamlit app) to provide configuration for the
+DocumentSummaryGenerator class. It contains arguments related to sourcing and inferring the LLM, data related arguments
+along with arguments for the query_engine (aka, the summarizer which uses the LLM to generate summaries based on a
+strategy).
+
 ## Examples
+**Example streamlit UI**
+
+**Example Phoenix observability UI**
+
+**Example deepeval evaluation output**
+
+**Example deepeval evaluation UI**
 
 ## License
 

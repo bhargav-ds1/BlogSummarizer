@@ -1,9 +1,11 @@
 # Configuration file which is used by the apps to define the parameters of the blog Summarizer
 
 Config = {
-    'summarizer_args': {'llm_args': {'llm_provider': 'llama-index-togetherai',
+    'summarizer_args': {'llm_args': {'llm_provider': 'llama-index-togetherai',  # llama-index-huggingface
                                      'llm_model_name': 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-                                     'llm_model_path': '',  # required if using locally downloaded model
+                                     # meta-llama/Llama-2-7b-chat-hf
+                                     'llm_model_path': '/Users/bhargavvankayalapati/Work/BlogSummarizer/BlogSummarizer/Models/meta-llama/Llama-2-7b-chat-hf',
+                                     # required if using locally downloaded model
                                      'offload_dir': './offload_dir',
                                      'cache_dir': '/Users/bhargavvankayalapati/Work/InHouseRAG/InHouseRAG/Models/meta-llama/Llama-2-7b-chat-hf',
                                      # required if using locally downloaded model
@@ -13,7 +15,7 @@ Config = {
                                                          'do_sample': False},
                                      'tokenizer_max_length': 4096,
                                      'stopping_ids': (50278, 50279, 50277, 1, 0), },
-                        'refetch_blogs': False, # To avoid refetching the blog content from the provided blogs URL.
+                        'refetch_blogs': False,  # To avoid refetching the blog content from the provided blogs URL.
                         'output_dir': 'Data/Blogs_content',
                         'observ_provider': 'phoenix',
                         },

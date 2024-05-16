@@ -19,7 +19,7 @@ root_dir = os.path.dirname(os.path.dirname(__file__))
 load_dotenv(root_dir + '/.envfile')
 # Initialize the custom evaluation model with configuration specified in the config_test file.
 custom_eval_llm_model = CustomEvaluationModel(model=LLMProvider(**Config['eval_model_args']).get_llm_model())
-evaluation_dataset = make_random_blog_eval_dataset(num_queries=2)
+evaluation_dataset = make_random_blog_eval_dataset(num_queries=4)
 print(len(evaluation_dataset.test_cases))
 
 
@@ -37,7 +37,7 @@ def test_answer_relevancy(test_case: LLMTestCase):
 
         This function uses the AnswerRelevancyMetric to evaluate the response relevancy and asserts the test outcome.
     """
-    answer_relevancy_metric = AnswerRelevancyMetric(threshold=0.5, model=custom_eval_llm_model)
+    answer_relevancy_metric = AnswerRelevancyMetric(threshold=0.5, model=custom_eval_llm_model, async_mode=False)
     assert_test(test_case, [answer_relevancy_metric])
 
 
@@ -90,7 +90,8 @@ def test_faithfulness(test_case: LLMTestCase):
 def test_hallucination(test_case: LLMTestCase):
     """
         Tests the hallucination rate of responses from a model against predefined test cases.
-        Higher score, if actual summary output and the retrieved context are comparable and no new information is added.
+        Higher score, if actual summary output and the retrieved context are not comparable and new information is
+        hallucinated and added by the LLM.
             Parameters:
                 test_case (LLMTestCase): A test case object containing the input query, generated response and contexts.
         Notes:
@@ -108,7 +109,7 @@ def test_hallucination(test_case: LLMTestCase):
 def test_toxicity(test_case: LLMTestCase):
     """
         Tests the toxicity of responses from a model against predefined test cases.
-        Higher score, if the response does not contain any toxic content.
+        Higher score, if the response contains any toxic content.
 
             Parameters:
                 test_case (LLMTestCase): A test case object containing the input query, generated response and contexts.
