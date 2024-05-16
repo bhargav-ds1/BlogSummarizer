@@ -55,7 +55,6 @@ class LLMProvider:
         """
         # option to use llm from different sources, HuggingFace, Langchain, AWS, etc.
         # API provided by Together-AI is used to build and test this project
-        llm = OpenAI()
         if self.llm_provider == 'langchain-openai':
             pass
         elif self.llm_provider == 'llama-index-huggingface':
