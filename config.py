@@ -1,9 +1,9 @@
 # Configuration file which is used by the apps to define the parameters of the blog Summarizer
 
 Config = {
-    'summarizer_args': {'llm_args': {'llm_provider': 'llama-index-togetherai',  # llama-index-huggingface
+    'summarizer_args': {'llm_args': {'llm_provider': 'llama-index-togetherai',  # llama-index-huggingface, llama-index-openai
                                      'llm_model_name': 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-                                     # meta-llama/Llama-2-7b-chat-hf
+                                     # meta-llama/Llama-2-7b-chat-hf, gpt-3.5-turbo
                                      'llm_model_path': '/Users/bhargavvankayalapati/Work/BlogSummarizer/BlogSummarizer/Models/meta-llama/Llama-2-7b-chat-hf',
                                      # required if using locally downloaded model
                                      'offload_dir': './offload_dir',

@@ -90,10 +90,10 @@ pip install -r requirements.txt
 
 - TogetherAI (https://api.together.ai/) (Favoured)
 - HuggingFace (https://huggingface.co/)
-- OpenAI (https://platform.openai.com/)
+- OpenAI (https://platform.openai.com/) (incurs charges)
 
 **Fill in API keys and other required config if any**:
-Fill the API key for accessing the LLMs in the .envfile.
+Fill the API key for accessing the LLMs in the .envfile and uncomment the corresponding line
 
 ## Usage
 

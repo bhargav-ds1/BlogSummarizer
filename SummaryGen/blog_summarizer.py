@@ -147,7 +147,7 @@ class DocumentSummaryGenerator:
             print('Using stored blogs content')
             docstore = SimpleDocumentStore().from_persist_dir(self.output_dir)
 
-            return docstore
+        return docstore
 
     def get_titles(self) -> List[str]:
         """
