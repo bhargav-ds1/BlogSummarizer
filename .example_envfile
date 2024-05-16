@@ -1,6 +1,11 @@
 # Fill and uncomment the API key for either hugging_face_token, TOGETHER_API_KEY or OPENAI_API_KEY to infer an LLM model
 # use the DEEPEVAL_API_KEY to login to deepeval to visualize evaluations in a UI.
 
+################################################
+# Rename this file to .envfile after filling in valid API keys or create a new .envfile with variable names as shown
+# below.
+################################################
+
 #hugging_face_token=
 #TOGETHER_API_KEY=
 #DEEPEVAL_API_KEY=
