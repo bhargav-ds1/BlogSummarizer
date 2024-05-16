@@ -139,9 +139,9 @@ strategy).
 
 ## Examples
 **Example streamlit UI**
-
+![](https://github.com/bhargav-ds1/BlogSummarizer/blob/main/Examples/Screenshot%202024-05-16%20at%2012.42.59.png)
 **Example Phoenix observability UI**
-
+![]()
 **Example deepeval evaluation output**
 
 **Example deepeval evaluation UI**
