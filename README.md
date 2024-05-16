@@ -139,13 +139,13 @@ strategy).
 
 ## Examples
 **Example streamlit UI**
-![](https://github.com/bhargav-ds1/BlogSummarizer/blob/main/Examples/Screenshot%202024-05-16%20at%2012.42.59.png)
+![](https://github.com/bhargav-ds1/BlogSummarizer/blob/main/Examples/streamlit_UI.png)
 **Example Phoenix observability UI**
-![]()
+![](https://github.com/bhargav-ds1/BlogSummarizer/blob/main/Examples/phoenix_UI.png)
 **Example deepeval evaluation output**
-
+![](https://github.com/bhargav-ds1/BlogSummarizer/blob/main/Examples/deepeval_cmd.png)
 **Example deepeval evaluation UI**
-
+![](https://github.com/bhargav-ds1/BlogSummarizer/blob/main/Examples/deepeval_UI.png)
 ## License
 
 This project is licensed under the Apache License - see the LICENSE.md file for details.
