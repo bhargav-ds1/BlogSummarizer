@@ -1,0 +1,7 @@
+# Fill and uncomment the API key for either hugging_face_token, TOGETHER_API_KEY or OPENAI_API_KEY to infer an LLM model
+# use the DEEPEVAL_API_KEY to login to deepeval to visualize evaluations in a UI.
+
+#hugging_face_token=
+#TOGETHER_API_KEY=
+#DEEPEVAL_API_KEY=
+#OPENAI_API_KEY=
