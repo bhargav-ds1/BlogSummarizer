@@ -3,16 +3,17 @@
 Config = {
     'summarizer_args': {'llm_args': {'llm_provider': 'llama-index-togetherai',
                                      'llm_model_name': 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-                                     'llm_model_path': '',
+                                     'llm_model_path': '',  # required if using locally downloaded model
                                      'offload_dir': './offload_dir',
                                      'cache_dir': '/Users/bhargavvankayalapati/Work/InHouseRAG/InHouseRAG/Models/meta-llama/Llama-2-7b-chat-hf',
+                                     # required if using locally downloaded model
                                      'local_files_only': True, 'context_window': 4096,
                                      'max_new_tokens': 512,
                                      'generate_kwargs': {"temperature": 0.7, "top_k": 50, "top_p": 0.95,
                                                          'do_sample': False},
                                      'tokenizer_max_length': 4096,
                                      'stopping_ids': (50278, 50279, 50277, 1, 0), },
-                        'refetch_blogs': False,
+                        'refetch_blogs': False, # To avoid refetching the blog content from the provided blogs URL.
                         'output_dir': 'Data/Blogs_content',
                         'observ_provider': 'phoenix',
                         },
@@ -27,5 +28,7 @@ Config = {
                                                   "---------------------\n"
                                                   "Given the information and not prior knowledge, summarize the blog.\n"
                                                   "Summary: ",
+                          # Using a custom summary template to help generate summaries. This prompt can be optimized
+                          # for an optimized response from the LLM.
                           'use_async': False},
 }
