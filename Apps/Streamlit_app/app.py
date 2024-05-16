@@ -2,6 +2,14 @@ import streamlit as st
 import os
 import sys
 from typing import List, Tuple
+import logging
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+
+# This module is run using streamlit CLI command from the project root.
+# 'Streamlit run Apps/Streamlit_app/app.py'
+# This renders the UI at http://localhost:8501/
 
 st.set_page_config(  # Added favicon and title to the web app
     page_title="Blog Summariser",
@@ -14,11 +22,6 @@ from SummaryGen.blog_summarizer import DocumentSummaryGenerator
 from config import Config
 from llama_index.core.base.response.schema import StreamingResponse
 
-"""
-This module is run using streamlit CLI command from the project root.
-'Streamlit run Apps/Streamlit_app/app.py'
-This renders the UI at http://localhost:8501/
-"""
 
 @st.cache_resource
 def get_document_summarizer() -> Tuple[DocumentSummaryGenerator, List]:
@@ -33,8 +36,7 @@ def get_document_summarizer() -> Tuple[DocumentSummaryGenerator, List]:
                     - As, streamlit re-runs the whole application for every change. To avoid re-running the summary generator,
                 this function result is cached by using the cache_resource decorator.
 
-
-            """
+    """
     document_summarizer = DocumentSummaryGenerator(**Config['summarizer_args'], **Config['query_engine_args'])
     titles = document_summarizer.get_titles()
     return document_summarizer, titles
@@ -94,7 +96,5 @@ def makeStreamlitApp() -> None:
 
 
 if __name__ == '__main__':
-    """
-    Entrypoint to the streamlit application.
-    """
+    # Entrypoint to the streamlit application.
     makeStreamlitApp()

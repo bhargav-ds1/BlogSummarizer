@@ -15,7 +15,7 @@ class CustomEvaluationModel(DeepEvalBaseLLM):
         Notes:
             Defining this model is required to use an LLM model other than OpenAI's models as evaluation LLMs for the
             deepeval framework.
-        """
+    """
 
     def __init__(
             self,
