@@ -94,7 +94,7 @@ def make_eval_dataset_from_phoenix_df(span_df: pd.DataFrame = None,
         test_cases.append(
             LLMTestCase(  # input="Given the information and not prior knowledge, summarize the blog.\n"
                 #     "Summary: ",
-                input=llm_span['attributes.llm.prompt_template.template'].iloc[0],
+                input=eval(str(llm_span['attributes.llm.input_messages'].iloc[0]))[0]['message.content'],
                 actual_output=llm_span['attributes.output.value'].iloc[0],
                 context=[eval(str(llm_span['attributes.llm.prompt_template.variables'].iloc[0]))['context_str']],
                 retrieval_context=[
@@ -102,3 +102,8 @@ def make_eval_dataset_from_phoenix_df(span_df: pd.DataFrame = None,
             )
         )
     return EvaluationDataset(test_cases=test_cases)
+
+
+if __name__ == '__main__':
+    dataset = make_random_blog_eval_dataset(num_queries=4)
+    print(len(dataset))
